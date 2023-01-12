@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.cusord.dao.CusordProductDao">
+
+<!-- 제품 목록 조회 -->
+<select id="selectProduct"  resultType="kr.happyjob.study.cusord.model.CusordProductModel">
+		
+		select tp.prodNo
+			  ,tp.prodName
+		      ,td.detail_name as prodCate
+		      ,tp.mfName
+		      ,tp.selPrice
+		from tb_product tp
+		inner join (
+					select detail_code
+						  ,detail_name
+					from tb_detail_code 
+		) td on tp.prodCate = td.detail_code
+	
+	<where>
+		<choose>
+				<when test="(searchCt!=null) and (!searchCt.equals(''))">
+						and tp.prodCate = #{searchCt}
+						and tp.prodName LIKE '%${searchPn}%'
+						
+			</when>
+			<!-- <when test="(searchValue!=null) and (!searchValue.equals(''))">
+						and tp.prodName  LIKE CONCAT('%', #{searchValue}, '%')
+			</when> -->
+		</choose>
+	</where>
+	
+	order by tp.prodNo desc
+	LIMIT #{pageStartN}, #{pageRow}
+</select>
+
+
+<!-- 제품 개수 조회 -->
+<select id="selectProductCnt" resultType="int">
+	select count(*) 
+	from scmright.tb_product tp
+		inner join (
+					select detail_code
+						  ,detail_name
+					from scmright.tb_detail_code 
+		) td on tp.prodCate = td.detail_code
+	
+	<where>
+		<choose>
+			<when test="(searchCt!=null) and (!searchCt.equals(''))">
+						and tp.prodCate = #{searchCt}
+						and tp.prodName LIKE '%${searchPn}%'
+			</when>
+			<!-- <when test="(searchValue!=null) and (!searchValue.equals(''))">
+						and tp.prodName  LIKE CONCAT('%', #{searchValue}, '%')
+			</when> -->
+		</choose>
+	</where>
+
+</select>
+
+
+<!-- 제품 단건 조회 -->
+<select id="selectProductDetail" resultType="kr.happyjob.study.cusord.model.CusordProductModel">
+	select tp.prodNo
+		  ,tp.mfName
+	      ,tp.selPrice
+	      ,tp.prodInfo
+	      ,ta.att_no
+	      ,ta.att_ori
+	      ,ta.att_nli
+	      ,ta.att_mul
+	from tb_product tp
+	left outer join tb_attachment ta on tp.att_no = ta.att_no
+	<where>
+	and tp.prodNo = #{prodNo}
+	</where>
+</select>
+
+
+<!-- 같은 유저 장바구니에 동일한 상품 있나 조회 -->
+<select id="selectSameProduct" resultType="int">
+	select count(*)
+	from tb_cart
+	<where>
+		and loginID=#{loginID}
+		and prodNo=#{prodNo}
+	</where>
+</select>
+
+<!-- 장바구니에 제품 추가 -->
+<insert id="insertCart" >
+	<selectKey resultType="int" keyProperty="counting_cartNo" order="BEFORE">
+		select ifnull(max(cartNo),0)+1 from tb_cart
+	</selectKey>
+		insert into tb_cart
+			   (
+		       cartNo
+			   ,prodNo
+		       ,loginID
+		       ,cartCnt
+		       ,cartDel
+		       )
+		       values(
+		       #{counting_cartNo}
+		       ,#{prodNo}
+		       ,#{loginID}
+		       ,#{cartCnt}
+		       ,#{cartDel}
+		       )
+</insert>
+
+
+
+<!--  제품 주문 -->
+<insert id="insertOrder" >
+	<selectKey resultType="int" keyProperty="counting_orderNo" order="BEFORE">
+		select ifnull(max(coNo),0)+1 from tb_cOrder
+	</selectKey>
+		insert into tb_cOrder
+			   (
+		    		coNo
+		    		,prodNo
+		    		,loginID
+		    		,coCnt
+		    		,coDate
+		    		,coDel
+		    		,coSts
+		    		,coDpsts
+		       )
+		       values(
+		        #{counting_orderNo}
+		       ,#{prodNo}
+		       ,#{loginID}
+		       ,#{coCnt}
+		       ,#{coDate}
+		       ,#{coDel}
+		       ,#{coSts}
+		       ,#{coDpsts}
+		     
+		       )
+</insert>
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>
+
+
+

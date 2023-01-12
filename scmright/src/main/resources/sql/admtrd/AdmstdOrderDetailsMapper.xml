@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.happyjob.study.admtrd.dao.AdmstdOrderDetailsDao">
+	<!-- 일일 수주 목록 조회 -->
+	<select id="getOderList" resultType="kr.happyjob.study.admtrd.model.AdmstdOrderDetailsVo">
+      SELECT co.coNO
+      ,co.coDate
+      ,ui.com_name
+      ,pro.prodNo
+      ,pro.prodName
+      ,st.strCnt
+      ,pro.delPrice
+      ,co.coCnt
+      ,co.coSts
+      ,co.coDel
+      ,co.coDpsts
+      ,prodCnt
+	  FROM tb_cOrder co 
+	    LEFT OUTER JOIN tb_product pro ON co.prodNo = pro.prodNo
+	    LEFT OUTER JOIN tb_userinfo ui ON co.loginID = ui.loginID
+	    LEFT OUTER JOIN tb_stock st ON pro.prodNo = st.prodNo
+	    LEFT OUTER JOIN (SELECT coNo
+                               ,SUM(prodCnt) prodCnt
+	                        FROM tb_delList
+	                       GROUP BY coNo
+	    				) del ON co.coNo = del.coNo
+	  <where>
+		  <if test="startDate != null and endDate != null">
+		  	AND #{startDate} &lt;= co.coDate AND #{endDate} &gt;= co.coDate
+		  </if>
+		  <if test="coDpsts == 'refund'">
+		  	AND co.coDpsts = 1
+		  </if>
+	  </where>
+	  ORDER BY co.coNo DESC
+	  LIMIT #{startnum},#{pagesize}
+	  
+	</select>
+	
+	<select id="getshipping" resultType="kr.happyjob.study.admtrd.model.AdmstdOrderDetailsVo">
+      SELECT co.coNO
+      ,co.coDate
+      ,ui.com_name
+      ,pro.prodName
+      ,sum(st.strCnt)
+      ,co.coCnt
+	  FROM tb_cOrder co 
+	    LEFT OUTER JOIN tb_product pro ON co.prodNo = pro.prodNo
+	    LEFT OUTER JOIN tb_userinfo ui ON co.loginID = ui.loginID
+	    LEFT OUTER JOIN tb_stock st ON pro.prodNo = st.prodNo
+	  WHERE co.coNO = ${coNo}
+	</select>
+	
+	<select id="getOrder" resultType="kr.happyjob.study.admtrd.model.AdmstdOrderVo">
+	      SELECT pro.prodNo
+	      ,pro.prodName
+	      ,sup.supName
+	    FROM tb_product pro
+	      LEFT OUTER JOIN tb_supplier sup ON pro.supNo = sup.supNo
+	    WHERE pro.prodNo = #{prodNo}
+	</select>
+	
+	<select id="searchlistcnt" resultType="int">
+	      SELECT COUNT(*)
+			  FROM tb_cOrder co 
+			  <where>
+				  <if test="startDate != null and endDate != null">
+				  	AND #{startDate} &lt;= co.coDate AND #{endDate} &gt;= co.coDate
+				  </if>
+				  <if test="coDpsts == 'refund'">
+				  	AND co.coDpsts = 1
+				  </if>
+			  </where>
+	</select>
+	
+	<select id="getwhallCnt" resultType="int">
+		SELECT IFNULL(
+              (SELECT strCnt
+                  FROM tb_stock
+                WHERE strNo = ${strNo} AND prodNo = ${prodNo}
+                ), 0
+                ) strCnt
+                FROM tb_stock
+                UNION ALL
+                
+                SELECT 0 strCnt
+                FROM DUAL
+                
+                LIMIT 1
+	</select>
+	
+	<select id="getDelivery" resultType="String">
+		SELECT strMnm
+		  FROM tb_storage
+		 WHERE strNo = ${strNo}
+	</select>
+	
+	<select id="getdelNo" resultType="int">
+		SELECT MAX(delNo)
+  			FROM tb_delList
+	</select>
+	
+	<insert id="shippingInsert">
+       <selectKey resultType="int" keyProperty="delNo" order="BEFORE">
+            SELECT MAX(delNo) + 1 FROM tb_delList
+        </selectKey>  
+		INSERT INTO tb_delList
+		            (
+		               delNo
+		              ,coNo
+		              ,strNo
+		              ,prodNo
+		              ,prodCnt
+		              ,delSts
+		              ,delDsts
+		            ) VALUES (
+		                        #{delNo}
+		                       ,${coNo}
+		                       ,${strNo}
+		                       ,${prodNo}
+		                       ,${prodCnt}
+		                       ,#{delSts}
+		                       ,${delDsts}
+		                     )
+	</insert>
+	
+	<select id="orderCnt" resultType="int">
+		SELECT IFNULL(
+              (SELECT SUM(prodCnt) prodCnt
+                FROM tb_delList
+               WHERE coNo = ${coNo}
+                ), 0
+                ) coNo
+                FROM tb_delList
+                UNION ALL
+                
+                SELECT 0 coNo
+                FROM DUAL
+                
+                LIMIT 1
+	</select>
+	
+</mapper>

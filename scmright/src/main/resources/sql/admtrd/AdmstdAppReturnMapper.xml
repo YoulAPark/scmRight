@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.happyjob.study.admtrd.dao.AdmstdAppReturnDao">
+
+	<select id="getAppReturnList" resultType="kr.happyjob.study.admtrd.model.AdmstdAppReturnVo">
+		SELECT ui.com_name
+			  ,ret.retNo
+			  ,ret.retADate
+			  ,co.prodNo
+			  ,pro.prodName
+			  ,co.coCnt
+			  ,ret.retCnt
+			  ,ret.retPrice
+			  ,ret.retEsts
+		FROM tb_retList ret
+			INNER JOIN tb_cOrder co ON co.coNo = ret.coNo
+			INNER JOIN tb_product pro ON co.prodNo = pro.prodNo
+			INNER JOIN tb_userinfo ui ON co.loginID = ui.loginID
+		<where>
+			<if test="clickpagenum != null and !clickpagenum.equals('')">
+				ret.retEsts = 0
+			</if>
+			<choose>
+				<!-- 반품 전체 -->
+				<when test="selectKey == 'all'">
+					<if test="retADate != null and !retADate.equals('')">
+						AND #{retADate} = ret.retADate
+					</if>
+				</when>
+				<!-- 기업명 -->
+				<when test="selectKey == 'com_name'">
+					<if test="searchKey != null and !searchKey.equals('')">
+						AND ui.com_name LIKE "%${searchKey}%"
+					</if>
+					<if test="retADate != null and !retADate.equals('')">
+						AND #{retADate} = ret.retADate
+					</if>
+				</when>
+				<!-- 반품코드 -->
+				<when test="selectKey == 'refund_no'">
+					<if test="searchKey != null and !searchKey.equals('')">
+						AND ret.retNo LIKE "%${searchKey}%"
+					</if>
+					<if test="retADate != null and !retADate.equals('')">
+						AND #{retADate} = ret.retADate
+					</if>
+				</when>
+				<!-- 제품번호 -->
+				<when test="selectKey == 'pro_no'">
+					<if test="searchKey != null and !searchKey.equals('')">
+						AND co.prodNo LIKE "%${searchKey}%"
+					</if>
+					<if test="retADate != null and !retADate.equals('')">
+						AND #{retADate} = ret.retADate
+					</if>
+				</when>
+				<!-- 제품명 -->
+				<when test="selectKey == 'pro_name'">
+					<if test="searchKey != null and !searchKey.equals('')">
+						AND pro.prodName LIKE "%${searchKey}%"
+					</if>
+					<if test="retADate != null and !retADate.equals('')">
+						AND #{retADate} = ret.retADate
+					</if>
+				</when>
+			</choose>
+		</where>
+		ORDER BY ret.retNo DESC
+		LIMIT #{startnum},#{pagesize}
+	</select>
+
+	<select id="searchlistcnt" resultType="int">
+		SELECT COUNT(*)
+			FROM tb_retList ret
+			INNER JOIN tb_cOrder co ON co.coNo = ret.coNo
+			INNER JOIN tb_product pro ON co.prodNo = pro.prodNo
+			INNER JOIN tb_userinfo ui ON co.loginID = ui.loginID
+		<where>
+			<if test="clickpagenum != null and !clickpagenum.equals('')">
+				ret.retEsts = 0
+			</if>
+			<choose>
+				<!-- 반품 전체 -->
+				<when test="selectKey == 'all'">
+					<if test="retADate != null and !retADate.equals('')">
+						AND #{retADate} = ret.retADate
+					</if>
+				</when>
+				<!-- 기업명 -->
+				<when test="selectKey == 'com_name'">
+					<if test="searchKey != null and !searchKey.equals('')">
+						AND ui.com_name LIKE "%${searchKey}%"
+					</if>
+					<if test="retADate != null and !retADate.equals('')">
+						AND #{retADate} = ret.retADate
+					</if>
+				</when>
+				<!-- 반품코드 -->
+				<when test="selectKey == 'refund_no'">
+					<if test="searchKey != null and !searchKey.equals('')">
+						AND ret.retNo LIKE "%${searchKey}%"
+					</if>
+					<if test="retADate != null and !retADate.equals('')">
+						AND #{retADate} = ret.retADate
+					</if>
+				</when>
+				<!-- 제품번호 -->
+				<when test="selectKey == 'pro_no'">
+					<if test="searchKey != null and !searchKey.equals('')">
+						AND co.prodNo LIKE "%${searchKey}%"
+					</if>
+					<if test="retADate != null and !retADate.equals('')">
+						AND #{retADate} = ret.retADate
+					</if>
+				</when>
+				<!-- 제품명 -->
+				<when test="selectKey == 'pro_name'">
+					<if test="searchKey != null and !searchKey.equals('')">
+						AND pro.prodName LIKE "%${searchKey}%"
+					</if>
+					<if test="retADate != null and !retADate.equals('')">
+						AND #{retADate} = ret.retADate
+					</if>
+				</when>
+			</choose>
+		</where>
+	</select>
+	
+	<update id="returnUpdate">
+		UPDATE tb_retList SET retEsts = 1, strNo = ${strNo} WHERE retNo = ${retNo}
+	</update>
+
+</mapper>

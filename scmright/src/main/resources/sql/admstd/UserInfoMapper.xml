@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace : Mapper와 연결된 dao의 Root 입력 / ERROR 많이 발생하니 유의할 것 -->
+<mapper namespace="kr.happyjob.study.admstd.dao.AdmstdUserInfoDao">
+
+	<!-- 회원 List 출력 -->
+	<select id="listUsers" resultType="kr.happyjob.study.admstd.model.AdmstdUserInfoModel">
+		SELECT  
+			    ui.loginID
+			  , dc.detail_name AS divCD
+		      , IFNULL(ui.com_name, ui.name)<!-- AS 회사명or이름 -->
+		      , ui.com_name <!-- AS 회사명 -->
+		      , dc2.detail_name AS chaCD <!-- AS 담당업무 -->
+			  , ui.name <!-- AS 담당자명 -->
+			  , ui.hp1 <!-- AS 연락처-->
+			  , ui.hp2
+			  , ui.hp3
+		FROM  
+			tb_userinfo ui
+		          LEFT JOIN (SELECT dc.group_code, dc.detail_code, dc.detail_name FROM tb_detail_code dc WHERE dc.group_code = 'divCD') dc
+		          		ON ui.divCd = dc.detail_code
+		          LEFT JOIN (SELECT dc.group_code, dc.detail_code, dc.detail_name FROM tb_detail_code dc WHERE group_code = 'chaCD') dc2
+		          		ON ui.user_type = dc2.detail_code
+		LIMIT #{pageIndex}, #{pageSize};
+	</select>
+	
+	<!-- 회원 count 출력 -->
+	<select id="countUser" resultType="int">
+		SELECT
+			count(loginID)
+		FROM tb_userinfo;
+	</select>
+	
+	<!-- 회원 단 건 출력 -->   
+	<select id="detailUser" resultType="kr.happyjob.study.admstd.model.AdmstdUserInfoModel">
+		SELECT  ui.loginID
+		      , ui.password
+		      , ui.name
+		      , ui.hp1
+		      , ui.hp2
+		      , ui.hp3
+		      , ui.email
+		      , ui.regdate
+		      , ui.com_name
+		      , ui.postalCode
+		      , ui.addr
+		      , ui.addrDt
+		      , ui.bankName
+		      , ui.bankNo
+		      , dc.detail_name AS divCD
+		      , dc2.detail_name AS chaCD
+		  FROM tb_userinfo ui
+		      LEFT JOIN (SELECT detail_code, group_code, detail_name FROM tb_detail_code WHERE group_code = 'divCD') dc
+		           ON ui.divcd = dc.detail_code
+		      LEFT JOIN (SELECT detail_code, group_code, detail_name FROM tb_detail_code WHERE group_code = 'chaCD') dc2
+		           ON ui.user_type = dc2.detail_code
+		  WHERE ui.loginId = #{loginID};
+	</select>
+	
+	<!-- 회원 추가 -->
+	<!-- <select id="insertUser">
+		INSERT INTO  
+		  tb_userinfo (
+			                loginID
+			  		      , password
+			  		      , name
+			  		      , hp1
+			  		      , hp2
+			  		      , hp3
+			  		      , email
+			  		      , regdate
+			  		      , com_name
+			  		      , postalCode
+			  		      , addr
+			  		      , addrDt
+			  		      , bankName
+			  		      , bankNo
+						)
+		  VALUES (
+		  			#{loginID}
+		  			, #{password}
+		  			, #{name}
+		  			, #{hp1}
+		  			, #{hp2}
+		  			, #{hp3}
+		  			, #{email}
+		  		 	, #{regdate}
+		  		 	, #{com_name}
+		  		 	, #{postalCode}
+		  		 	, #{addr}
+		  		 	, #{addrDt}
+		  		 	, (SELECT detail_name FROM tb_detail_code WHERE group_code = #{bank_cd})
+		  		 	, #{bankNo}
+		  		 	, #{email}
+		  		 )
+	</select> -->
+	
+	<!-- 회원 수정 -->
+	
+	<!-- 회원 삭제 -->
+	
+	<!-- [확인요망] 회원 복구 -->
+
+</mapper>
+ 

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.happyjob.study.exesal.dao.ProfitDao">
+
+	<select id="profitLsit" resultType="kr.happyjob.study.exesal.model.ProfitModel">
+select ui.loginID as ID,
+         ui.com_name as company,
+         sum(pr.selPrice* od.coCnt) as profit,
+         ifnull(sum(pr.selPrice * re.retCnt),0) as loss,
+         sum((pr.selPrice - pr.delPrice)*od.coCnt - ifnull((pr.selPrice - pr.delPrice) * (re.retCnt),0)) as pureP
+ from tb_retList re
+          right outer join tb_cOrder od ON od.coNo = re.coNo
+          inner join tb_userinfo ui ON ui.loginID = od.loginID
+          left outer join tb_product pr ON pr.prodNo = od.prodNo
+          <where>
+          <if test="(searchvalue != null) and (!searchvalue.equals(''))">
+		 	AND ui.com_name LIKE CONCAT('%', #{searchvalue}, '%')
+		 </if>
+          <if test="(startDate != null) and (!startDate.equals(''))">
+			AND od.coDate between  #{startDate} and #{endDate}
+		 </if>
+          </where>
+group by ui.loginID
+         order by  ui.com_name asc      
+		
+	</select>
+
+ <select id="searchlistcnt" resultType="int">																											<!--  총건수 구하기 -->		
+select count(*)
+  from (
+  select ui.loginID as ID,
+         ui.com_name as company,
+         sum(pr.selPrice* od.coCnt) as profit,
+         ifnull(sum(pr.selPrice * re.retCnt),0) as loss,
+         sum((pr.selPrice - pr.delPrice)*od.coCnt - ifnull((pr.selPrice - pr.delPrice) * (re.retCnt),0)) as pureP
+ from tb_retList re
+          right outer join tb_cOrder od ON od.coNo = re.coNo
+          inner join tb_userinfo ui ON ui.loginID = od.loginID
+          left outer join tb_product pr ON pr.prodNo = od.prodNo
+           <where>
+          <if test="(searchvalue != null) and (!searchvalue.equals(''))">
+		 	AND ui.com_name LIKE CONCAT('%', #{searchvalue}, '%')
+		 </if>
+          <if test="(startDate != null) and (!startDate.equals(''))">
+			AND od.coDate between  #{startDate} and #{endDate}
+		 </if>
+          </where>
+group by ui.loginID, ui.com_name 
+          
+        ) a 
+       
+		       
+    </select>
+
+	<select id="profitDetailList"  resultType="kr.happyjob.study.exesal.model.ProfitModel">
+		select ui.com_name as company ,
+			        pr.prodName,
+			     sum(pr.selPrice * od.coCnt) as profit,
+			      sum(ifnull((pr.selPrice * re.retCnt),0)) as loss,
+			        DATE_FORMAT(od.coDate, '%Y-%m-%d') as codate
+		  from  tb_cOrder od 
+				  right outer join tb_userinfo ui ON ui.loginID = od.loginID
+				  inner join tb_product pr ON pr.prodNo = od.prodNo
+				  left outer join tb_retList re on re.coNo = od.coNo
+				  where ui.loginID = #{loginID}
+           group by pr.prodName	
+               	
+		 		limit #{startnum},#{pagesize}	
+	</select>
+
+	<select id="searchlistcnt2" resultType="int">																										<!--  로그인아이디를 맞춰서 c타입이걸로 전체 갯수 세어줌  -->
+           select count(*)
+             
+		 from (
+				select ui.com_name as company,
+			        pr.prodName,
+			     sum(pr.selPrice * od.coCnt)as profit,
+			      sum(ifnull((pr.selPrice * re.retCnt),0)) as loss,
+			        DATE_FORMAT(od.coDate, '%Y-%m-%d')as date
+		  from  tb_cOrder od 
+				  right outer join tb_userinfo ui ON ui.loginID = od.loginID
+				  inner join tb_product pr ON pr.prodNo = od.prodNo
+				  left outer join tb_retList re on re.coNo = od.coNo
+				  where ui.loginID = #{loginID}
+           group by pr.prodName	
+				
+				 ) ll
+				
+				
+				
+    </select>
+	
+
+
+
+
+	
+</mapper>
+
+

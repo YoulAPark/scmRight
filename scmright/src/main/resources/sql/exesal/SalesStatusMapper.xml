@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.happyjob.study.exesal.dao.SalesStatusDao">
+
+	<select id="salesStatusList" resultType="kr.happyjob.study.exesal.model.SalesStatusModel">
+		
+		select    ui.loginID,																																		<!--  로그인 tb_userinfo-->
+					  ui.com_name,																																	<!--  회사이름 tb_userinfo-->
+					  sum(pr.selPrice*od.coCnt)as sales_price,																						<!--  매출금액 -->
+					  sum((pr.selPrice - pr.delPrice) * od.coCnt) as profit_price															<!--  수익금액 -->
+		 from tb_userinfo ui																																				<!--  기준 tb_userinfo에서 가져온다~! -->
+				     inner join tb_cOrder  od on ui.loginID = od.loginID																		 <!--  기준 tb_userinfo와  inner join으로  tb_cOrder에 loginID 맞춰서 필요한걸 가져온다-->
+				     inner join tb_product pr on pr.prodNo = od.prodNo																	<!--  기준 tb_userinfo와  inner join으로  tb_product에 prodNo(제품번호) 맞춰서 필요한걸 가져온다-->
+	 where ui.user_type='C'   and od.coDpsts = '1'																									<!--  입금 완료(1) 인 것!  -->
+	 																																											<!--  유저타입은 C인걸로~! -->
+	
+		<if test="(searchvalue != null) and (!searchvalue.equals(''))">
+		 	AND ui.com_name LIKE CONCAT('%', #{searchvalue}, '%')
+		 </if>
+		 <if test="(startDate != null) and (!startDate.equals(''))">
+		 	AND od.coDate <![CDATA[ >= ]]>  #{startDate}
+		 </if>
+		 <if test="(endDate != null) and (!endDate.equals(''))">
+		 	AND od.coDate <![CDATA[ <= ]]> #{endDate}  
+		 </if>
+		 	group by  ui.com_name																									<!--  회사이름 끼리 묶는다 -->
+		
+
+			limit #{startnum},#{pagesize}	
+		
+	</select>
+
+ <select id="searchlistcnt" resultType="int">																											<!--  총건수 구하기 -->		
+		       select count(*)
+						from tb_userinfo ui
+						inner join tb_cOrder od on ui.loginID = od.loginID 
+						inner join tb_product pr on pr.prodNo = od.prodNo
+			 where ui.user_type='C' and od.coDpsts = '1'	
+			 
+		<if test="(searchvalue != null) and (!searchvalue.equals(''))">
+		 	AND ui.com_name LIKE CONCAT('%', #{searchvalue}, '%')
+		 </if>
+		<if test="(startDate != null) and (!startDate.equals(''))">
+		 	AND od.coDate <![CDATA[ >= ]]>  #{startDate}
+		 </if>
+		 <if test="(endDate != null) and (!endDate.equals(''))">
+		 	AND od.coDate <![CDATA[ <= ]]> #{endDate}  
+		 </if>
+    </select>
+
+	
+
+
+<select id="salesStatusDetailList"  resultType="kr.happyjob.study.exesal.model.SalesStatusModel">
+			select 	  ui.loginID,																																			<!--  로그인아이디 -->		
+						 ui.com_name,																																		<!--  고객회사 이름 -->		
+					  	 pr.prodName,																																		<!--  제품 이름 -->		
+					  	 sum(pr.selPrice*od.coCnt)as sales_price2,																					<!--  (제품에대한) 총 판매가격 -->		
+            			 DATE_FORMAT(od.coDate, '%Y-%m-%d') as coDate,																	<!-- SQL (날짜를 지정한 형식으로 출력) yyyy-mm-dd-->		
+					 	  sum((pr.selPrice - pr.delPrice) * od.coCnt) as profit_price2														<!--  (제품에대한) 총 순수익 -->	
+			  from tb_userinfo ui																																		<!--  기준 tb_userinfo에서 가져온다~! -->
+				    		 inner join tb_cOrder  od on ui.loginID = od.loginID 																<!--  기준 tb_userinfo와  inner join으로  tb_cOrder에 loginID 맞춰서 필요한걸 가져온다-->
+				    		 inner join tb_product pr on pr.prodNo = od.prodNo															<!--  기준 tb_userinfo와  inner join으로  tb_product에 prodNo(제품번호) 맞춰서 필요한걸 가져온다-->
+			 where ui.user_type='C' 	 and od.coDpsts = '1'																													<!--  유저타입은 C인걸로~! -->
+        	 and ui.loginID = #{loginID}																															<!--  같은 로그인 아이디 끼리~! -->
+    		   group by ui.com_name,																																<!--  회사이름 , 제품이름, 날짜기준으로 그룹해준다~(묶어준다) -->
+					    	  pr.prodName,
+               				 DATE_FORMAT(od.coDate, '%Y-%m-%d')
+      		 order by ui.com_name,																																	<!--  회사이름 , 제품이름, 날짜기준, 순서로 정렬해준다  -->
+					    	  pr.prodName,
+               				 DATE_FORMAT(od.coDate, '%Y-%m-%d')
+		 		limit #{startnum},#{pagesize}	
+	</select>
+
+	<select id="searchlistcnt2" resultType="int">																										<!--  로그인아이디를 맞춰서 c타입이걸로 전체 갯수 세어줌  -->
+             select count(*)
+				from tb_userinfo ui
+				inner join tb_cOrder  od on ui.loginID = od.loginID
+				inner join tb_product pr on pr.prodNo = od.prodNo
+			 where ui.user_type='C'     and od.coDpsts = '1'
+			 and ui.loginID = #{loginID}
+				
+				
+				
+    </select>
+
+ 
+
+	
+</mapper>
+
+

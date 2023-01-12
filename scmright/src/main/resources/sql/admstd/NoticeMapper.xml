@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace : Mapper와 연결된 dao의 Root 입력 / ERROR 많이 발생하니 유의할 것 -->
+<mapper namespace="kr.happyjob.study.admstd.dao.AdmstdNoticeDao">
+
+	<!-- 1. [READ] Notice 리스트  조회 -->
+	<select id="listNotice" resultType="kr.happyjob.study.admstd.model.AdmstdNoticeModel">
+		SELECT  ntcNo 글번호
+		      , title 제목
+		      , loginID 작성자
+		      , count 조회수
+		      , reg_date 작성일 
+		  FROM tb_notice
+		  ORDER BY ntcNo DESC;
+	</select>
+	
+	<!-- 2. [READ] Notice 단 건 조회 -->
+	<select id="selectOneNotice" resultType="kr.happyjob.study.admstd.model.AdmstdNoticeModel">
+		SELECT  ntcNo 글번호
+		      , title 제목
+		      , loginID 작성자
+		      , reg_date 작성시간
+		      , contents 내용
+		  FROM tb_notice
+		  WHERE ntcNo = #{ntcNo};
+	</select>
+	
+	<!-- 3. [CREATE] Notice 작성 -->
+	<insert id="insertNotice">
+		INSERT 
+		  INTO tb_notice  (
+		            ntcNo
+		          , title
+		          , loginID 
+		          , reg_date
+		          , contents
+		     <!-- , att_no 첨부파일 --> 
+		                  )
+		      VALUES      (
+		            #{ntcNo}
+		          , #{title}
+		          , #{loginID}
+		          , now()
+		          , #{contents}
+		     <!-- , #{att_no} 첨부파일 -->
+		                  );
+	</insert>
+	
+	<!-- 4. [UPDATE] Notice 수정 -->
+	<update id="updateNotice">            
+		UPDATE tb_notice
+		  SET   title = #{title}
+		      , contents = #{contents}
+		  WHERE ntcNo = #{ntcNo};
+	</update>
+	
+	<!-- 5. [DELETE] Notice 삭제 -->
+	<delete id="delNotice" parameterType="int">
+		DELETE 
+		  FROM tb_notice
+		  WHERE ntcNo = #{ntcNo};
+	</delete>
+	
+	<!-- 6. [UPDATE] 게시글 count -->
+	<update id="countNotice">
+		UPDATE tb_notice
+		  SET
+		      count = count+1
+		  WHERE ntcNo = #{ntcNo};
+  	</update>
+</mapper>
+ 

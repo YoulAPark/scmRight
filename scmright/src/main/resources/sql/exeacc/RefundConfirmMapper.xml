@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.happyjob.study.exeacc.dao.RefundConfirmDao">
+	<!-- 26페이지 반품관련 임원승인 혜원 ...지금은 용진 ! -->
+	
+	
+	<!-- 1. 승인전 반품 목록 띄우기  -->
+	<select id="selectBeforeApproveRefundList" parameterType="Map"
+		resultType="kr.happyjob.study.exeacc.model.RefundConfirmModel">
+
+		select <!-- @rownum:=@rownum+1 as row_num, -->
+					u.loginID,
+					rt.retNo,
+					p.prodNo,
+					st.strNo,
+					u.com_name,
+					p.prodName,
+					co.coDate,     
+					rt.retADate,
+					co.coCnt,
+					rt.retCnt,
+					p.selprice * rt.retCnt as total_price
+		from tb_cOrder co 
+		INNER  join tb_userinfo u on u.loginID = co.loginID and u.user_type  = 'C'
+		 INNER join tb_product p on p.prodNo =  co.prodNo
+		LEFT OUTER  join tb_retList rt on rt.coNo = co.coNO
+		LEFT OUTER  join tb_storage st on st.loginID = co.loginID
+					
+		<where>     		  
+				<if test="(sname != null) and (!sname.equals('')) ">
+					<choose>					
+						<when test= "searchKey eq 'all'.toString()">
+							AND CONCAT(u.com_name, p.prodName) REGEXP CONCAT('.', #{sname}, '.')
+						</when>	
+						<when test= "searchKey eq 'com_name'.toString()">
+							AND u.com_name LIKE CONCAT('%', #{sname}, '%')
+						</when>	
+						<when test= "searchKey eq 'prodName'.toString()">
+							AND p.prodName LIKE CONCAT('%', #{sname}, '%')
+						</when>	
+
+					</choose>
+				</if>
+				<if test="(fromDate != null) and (toDate != null)">
+					AND rt.retADate <![CDATA[ >= date(#{fromDate}) ]]> 
+					AND rt.retADate <![CDATA[ <= date(#{toDate})+1 ]]>
+				</if>		    
+		<!--  AND (@rownum:=0)=0 -->
+		 AND co.coNo is not null
+		 AND rt.retEsts = 1
+	    </where>
+	    ORDER BY rt.retNo ,p.prodNo ,st.strNo DESC
+		LIMIT #{pageIndex},#{pageSize}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</select>		
+	
+	
+	<!-- 2. 반품 목록 갯수 -->
+	<select id="countBeforeApprovePurchaseList" parameterType="Map" resultType="int">
+		select count(1)
+		from tb_cOrder co 
+		 	INNER  join tb_userinfo u on u.loginID = co.loginID and u.user_type  = 'C'
+		 INNER join tb_product p on p.prodNo =  co.prodNo
+		LEFT OUTER  join tb_retList rt on rt.coNo = co.coNO
+		LEFT OUTER  join tb_storage st on st.loginID = co.loginID
+		 
+		 	<where>     		  
+				<if test="(sname != null) and (!sname.equals('')) ">
+					<choose>					
+						<when test= "searchKey eq 'all'.toString()">
+							AND CONCAT(u.com_name, p.prodName) REGEXP CONCAT('.', #{sname}, '.')
+						</when>	
+						<when test= "searchKey eq 'com_name'.toString()">
+							AND u.com_name LIKE CONCAT('%', #{sname}, '%')
+						</when>	
+						<when test= "searchKey eq 'prodName'.toString()">
+							AND p.prodName LIKE CONCAT('%', #{sname}, '%')
+						</when>	
+
+					</choose>
+				</if>
+				<if test="(fromDate != null) and (toDate != null)">
+					AND rt.retADate <![CDATA[ >= date(#{fromDate}) ]]> 
+					AND rt.retADate <![CDATA[ <= date(#{toDate})+1 ]]>
+				</if>		    
+		 AND co.coNo is not null
+		 AND rt.retEsts = 1
+	    </where>
+		 
+		 
+	</select>
+	
+	
+	<!-- 임원승인이 최종 승인버튼 따악 누르면!  tb_refund 에 컨펌cd  1에서 2로   -->
+	<update id="updateRefundConfirm" parameterType="Map" >
+     	UPDATE tb_retList SET
+             retEsts = 2
+
+        <where>
+     		 AND retNo = #{retNo}
+        	AND retEsts = 1
+        </where>
+    </update> 
+   
+	
+	
+</mapper>

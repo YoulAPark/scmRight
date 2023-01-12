@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace : Mapper와 연결된 dao의 Root 입력 / ERROR 많이 발생하니 유의할 것 -->
+<mapper namespace="kr.happyjob.study.delcus.dao.DelCusDao">
+
+	<!-- [SELECT] 배송지시서 리스트 출력 -->
+	<select id="delList" resultType="kr.happyjob.study.delcus.model.DelCusModel">
+		SELECT  dl.delNo
+		      , ui.name 
+		      , ui.loginID
+		      , co.coNo 
+		      , co.coDate
+		      , co.coDel
+		      , sr.strMnm 
+		      , sr.strName
+		      , dl.delSts
+		  FROM tb_delList dl 
+		  LEFT JOIN tb_cOrder co ON dl.coNo = co.coNo
+		  LEFT JOIN tb_userinfo ui ON co.loginID = ui.loginID
+		  LEFT JOIN tb_storage sr ON dl.strNo = sr.strNo
+	</select>
+	
+	<!-- [SELECT] 배송지시서 단 건 출력 -->
+	<select id="delSelectOne" resultType="kr.happyjob.study.delcus.model.DelCusModel">
+		SELECT  co.coNo 
+		      , ui.name 
+		      , CONCAT(ui.addr,' ',ui.addrDt) AS totalAddr
+		      , pd.prodName 
+		      , co.coCnt 
+		      , st.strNo 
+		      , st.strName 
+		      , CONCAT(st.strAddr,' ',st.strDt) AS totalStrAddr
+		      , dl.delSts
+		      , dl.delNo
+		  FROM tb_cOrder co
+		    LEFT JOIN tb_userinfo ui ON ui.loginID = co.loginID
+		    LEFT JOIN tb_product pd ON co.prodNo = pd.prodNo
+		    LEFT JOIN tb_delList dl ON co.coNo = dl.coNo
+		    LEFT JOIN tb_storage st ON dl.strNo = st.strNo
+		  WHERE co.coNo = #{coNo}
+	</select>
+	
+	<!-- [SELECT] 배송No Count -->
+		<!-- 회원 count 출력 -->
+	<select id="countDel" resultType="int">
+		SELECT
+			count(delNo)
+		FROM tb_delList;
+	</select>
+	
+	<!-- [UPDATE] 배송상태 변경 -->
+	<update id="deliverySts">
+		UPDATE tb_delList dl
+		  SET dl.delSts = CASE 
+		                       WHEN delSts = 'waiting' THEN 'loading'
+		                       WHEN delSts = 'loading' THEN 'complete'
+		                       ELSE 'waiting' 
+		                  END
+		  WHERE dl.delNo = #{delNo};
+	</update>
+	
+<!-- ##########################################[반품지시서]########################################## -->
+	
+	<!-- delcusReturn -->
+	
+	<!-- [1] SELECT : List 출력 -->
+	<select id="delReturnList"  resultType="kr.happyjob.study.delcus.model.DelCusModel">
+		SELECT 	rl.retNo <!-- 반품번호  -->
+	        , ui.com_name
+	        , ui.loginID
+	        , rl.retPrice <!-- 반품금액 -->
+	        , rl.retPDate <!-- 반품처리일  -->
+		FROM tb_retList rl
+	   		LEFT JOIN tb_userinfo ui ON rl.loginID = ui.loginID
+	    WHERE rl.retEsts = 3
+	    GROUP BY ui.com_name <!-- 납품업체명이 같은 것끼리 묶음 -->
+	    HAVING rl.retPDate = rl.retPDate; <!-- 반품처리일이 같은 것끼리 묶음 -->
+	</select>
+	
+	<!-- [2] SELECT : 단 건 상세보기 출력 -->
+	<select id="delReturnSelectOne"  resultType="kr.happyjob.study.delcus.model.DelCusModel">
+		SELECT 	rl.retNo 
+			, rl.retPDate 
+            , ui.name 
+            , ui.loginID
+	        , pd.prodCate 
+	        , pd.prodName 
+	        , pd.mfName 
+	        , pd.selPrice 
+	        , rl.retCnt 
+	        , pd.prodNo
+	        , rl.strNo
+		FROM tb_cOrder co
+			CROSS JOIN tb_retList rl ON co.coNo = rl.coNo
+			CROSS JOIN tb_product pd ON co.prodNo = pd.prodNo
+	        INNER JOIN tb_supplier sl ON sl.supNo = pd.supNo
+	        LEFT JOIN tb_userinfo ui ON ui.loginID = co.loginID
+	    WHERE rl.retPDate = #{retPDate}
+	        AND rl.loginID = #{loginID}
+	    ORDER BY rl.retNo DESC;
+	</select>
+	
+	<!-- [3] SELECT : count 출력 -->
+	<select id="delReturnCnt" resultType="kr.happyjob.study.delcus.model.DelCusModel">>
+	SELECT 	count(rl.retNo) AS returnCnt
+	        , sl.supName
+	        , rl.retPDate
+		FROM tb_retList rl
+	    	LEFT JOIN tb_supplier sl ON rl.supNo = sl.supNo
+	    WHERE rl.retEsts = 3
+	   	GROUP BY sl.supName 
+	    HAVING rl.retPDate = rl.retPDate;
+	</select>
+	
+	<!-- [4-2] UPDATE : 창고 재고 수량 수정-->
+	<update id="delReturnStrCnt"> 
+	UPDATE tb_stock st
+		SET st.strCnt = st.strCnt + (SELECT rl.retCnt 
+										FROM tb_retList rl 
+											LEFT JOIN tb_storage sr ON sr.strNo = rl.strNo
+										WHERE rl.retNo = 1
+	                                    GROUP BY rl.retNo)
+		WHERE st.prodNo = #{prodNo} AND st.strNo = #{strNo};
+	</update>
+	
+	<!-- [4-2] UPDATE : retSts/retEsts 수정 -->
+	<update id="delReturnRetSts"> 
+	UPDATE tb_retList
+		SET retSts = 2, retEsts = 4
+	    WHERE retNo = #{retNo};
+	</update>
+
+</mapper>

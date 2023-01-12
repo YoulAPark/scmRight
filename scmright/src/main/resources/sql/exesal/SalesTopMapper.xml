@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.happyjob.study.exesal.dao.SalesTopDao">
+
+	<select id="salesTopList" resultType="kr.happyjob.study.exesal.model.SalesTopModel">
+		
+select @rownum:=@rownum+1 as row_num,
+	     	 ll.loginID,
+	  	  	 ll.com_name,
+	         ll.sales_price
+ from (      
+		      select ui.loginID,
+					       ui.com_name,
+					       sum(pr.selPrice*od.coCnt)as sales_price
+					  from tb_userinfo ui
+					   			inner join tb_cOrder od  on ui.loginID = od.loginID
+					   			inner join tb_product pr on pr.prodNo = od.prodNo																
+					 where ui.user_type='C' and od.coDpsts = '1'		
+					 				<if test="(startDate != null) and (!startDate.equals(''))">
+								 	AND od.coDate between  #{startDate} and #{endDate}
+								 	</if>
+<!-- 					<IF TEST="(STARTDATE != NULL) AND (!STARTDATE.EQUALS(''))"> -->
+<!-- 					 	AND OD.CODATE <![CDATA[ >= ]]>  #{STARTDATE} -->
+<!-- 					 </IF> -->
+<!-- 					 <IF TEST="(ENDDATE != NULL) AND (!ENDDATE.EQUALS(''))"> -->
+<!-- 					 	AND OD.CODATE <![CDATA[ <= ]]> #{ENDDATE}   -->
+<!-- 					 </IF> -->
+					 group by ui.loginID
+	                , ui.com_name		
+	         order by sum(pr.selPrice*od.coCnt) desc 
+      		 ) ll 
+ where (@rownum:=0)=0 
+ 
+ limit 0,10
+ 
+<!-- 
+  limit #{clickpagenum},#{pagesize}	    -->
+ 
+<!--  select ui.loginID, -->
+<!-- 					       ui.com_name, -->
+<!-- 					       sum(pr.selPrice*od.coCnt)as sales_price -->
+<!-- 					  from tb_userinfo ui -->
+<!-- 					   			inner join tb_cOrder od  on ui.loginID = od.loginID -->
+<!-- 					   			inner join tb_product pr on pr.prodNo = od.prodNo																 -->
+<!-- 					 where ui.user_type='C' and od.coDpsts = '1'		 -->
+<!-- 					 <if test=""> -->
+<!-- 					 </if> -->
+<!-- 					 group by ui.loginID -->
+<!-- 	                , ui.com_name		 -->
+<!-- 	         order by sum(pr.selPrice*od.coCnt) desc  -->
+<!-- 	         limit 0, 10 -->
+		
+		
+		
+	</select>
+
+ <select id="searchlistcnt" resultType="int">																										<!-- 총건수 구하기		 -->	
+		   
+		  select	count(*)
+ 			  from (      
+					      select ui.loginID,
+								       ui.com_name,
+								       sum(pr.selPrice*od.coCnt)as sales_price
+								  from tb_userinfo ui
+								   			inner join tb_cOrder od  on ui.loginID = od.loginID
+								   			inner join tb_product pr on pr.prodNo = od.prodNo																
+								 where ui.user_type='C' and od.coDpsts = '1'		
+								 <if test="(startDate != null) and (!startDate.equals(''))">
+								 	AND od.coDate <![CDATA[ >= ]]>  #{startDate}
+								 </if>
+								 <if test="(endDate != null) and (!endDate.equals(''))">
+								 	AND od.coDate <![CDATA[ <= ]]> #{endDate}  
+								 </if>
+								 group by ui.loginID
+				                , ui.com_name		
+				         order by sum(pr.selPrice*od.coCnt) desc 
+			      		 ) ll 
+ 			where (@rownum:=0)=0 		
+		   
+    </select>
+
+	
+
+
+
+
+ 
+
+	
+</mapper>
+
+

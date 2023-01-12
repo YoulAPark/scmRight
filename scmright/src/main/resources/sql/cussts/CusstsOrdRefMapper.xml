@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.cussts.dao.CusstsOrdRefDao">
+
+<!-- 제품 주문 목록 조회 -->
+<select id="selectOrder"  resultType="kr.happyjob.study.cussts.model.CusstsOrderModel">
+
+	select tco.coNo
+		   ,tp.prodName
+		   ,tp.selPrice
+	       ,tco.coCnt
+	       ,tco.coDate
+	       ,tco.coDel
+	       ,tdc.detail_name coSts
+	from tb_cOrder tco 
+	inner join tb_product tp on tp.prodNo = tco.prodNo
+	inner join (
+					select group_code
+						  ,detail_code
+	                      ,detail_name
+	               	 from tb_detail_code 
+	              	  where group_code = 'shipCD'
+					) tdc on tdc.detail_code = tco.coSts
+					
+	<where>
+	 	and loginID = #{loginID}
+	 	<if test="(searchValue!=null) and (!searchValue.equals(''))">
+	 		and tp.prodName  LIKE CONCAT('%', #{searchValue}, '%')
+	 	</if>
+	 	<if test="startDate != null and endDate != null">
+          AND #{startDate} &lt;= tco.coDate AND #{endDate} &gt;= tco.coDate
+        </if>
+	</where>
+	order by tco.coNo desc
+	LIMIT #{pageStartN}, #{pageRow}
+	
+</select>
+
+
+<!-- 주문 목록 개수 조회 -->
+<select id="selectOrderCnt" resultType="int">
+	select count(*) 
+	from tb_cOrder tco 
+	inner join tb_product tp on tp.prodNo = tco.prodNo
+	inner join (select group_code
+						  ,detail_code
+	                      ,detail_name
+	                	from tb_detail_code 
+	                	where group_code = 'shipCD'
+					) tdc on tdc.detail_code = tco.coSts
+	
+	<where>
+	 	and loginID = #{loginID}
+	 	<if test="(searchValue!=null) and (!searchValue.equals(''))">
+	 		and tp.prodName  LIKE CONCAT('%', #{searchValue}, '%')
+	 	</if>
+	 	<if test="startDate != null and endDate != null">
+           AND #{startDate} &lt;= tco.coDate AND #{endDate} &gt;= tco.coDate
+        </if>
+	</where>
+
+	order by tco.coNo desc
+</select>
+
+
+<!-- 주문 제품 클릭 시 해당 제품 상세 보기 -->
+<select id="selectOrderDetail" resultType="kr.happyjob.study.cussts.model.CusstsOrderModel">
+	select   tco.coNo
+			  ,tp.prodNo
+		      ,tp.prodCate
+		      ,tp.prodName
+		      ,tp.mfName
+		      ,tp.selPrice
+		      ,tco.coCnt
+		      ,tco.coSts
+		      ,tu.bankName
+		      ,tu.bankNo
+		      ,tu.addr
+		      ,tu.addrDt
+		from tb_cOrder tco
+		inner join tb_product tp on tp.prodNo = tco.prodNo
+		inner join tb_userinfo tu on tu.loginID = tco.loginID
+		<where>
+		and tco.coNo=#{coNo}
+		</where>
+</select>
+
+<insert id="insertRefund">
+	<selectKey resultType="int" keyProperty="counting_retNo" order="BEFORE">
+		select ifnull(max(retNo),0)+1 from tb_retList
+	</selectKey>
+	
+
+	insert into tb_retList
+		(
+			retNo
+			,coNo
+			,loginID
+			,retCnt
+			,retADate
+			,retPrice
+			,retInfo
+			,retSts
+			,retEsts
+		
+		) values(
+			#{counting_retNo}
+			,#{coNo}
+			,#{loginID}
+			,#{retCnt}
+			,#{retADate}
+			,#{retPrice}
+			,#{retInfo}
+			,#{retSts}
+			,#{retEsts}
+			
+        )
+</insert>
+
+
+<update id="updateCoSts">
+	update tb_cOrder
+		set coSts = #{coSts}
+	where coNo = #{coNo}
+</update>
+
+
+
+
+
+</mapper>

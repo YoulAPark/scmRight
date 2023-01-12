@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace : Mapper와 연결된 dao의 Root 입력 / ERROR 많이 발생하니 유의할 것 -->
+<mapper namespace="kr.happyjob.study.admstd.dao.AdmstdStrMngDao">
+
+	<!-- 리스트 전체출력 -->
+	<select id="admstdStrList" resultType="kr.happyjob.study.admstd.model.AdmstdStrMngModel">
+		SELECT 	  tb.strNo
+				, tb.strName
+		        , CONCAT(tb.strAddr,' ',tb.strDt) AS totalAddr
+		        , ui.name
+		        , ui.email
+		        , CONCAT(ui.hp1,'-',ui.hp2,'-',ui.hp3) AS totalHp    
+			FROM tb_storage tb
+		    LEFT JOIN tb_userinfo ui ON tb.loginID = ui.loginID
+		LIMIT #{pageIndex}, #{pageSize};
+	</select>
+
+	<!-- 단 건 출력 -->
+	<select id="admstdStrOne" resultType="kr.happyjob.study.admstd.model.AdmstdStrMngModel">
+		SELECT 	tb.strName
+		        , CONCAT(tb.strAddr,' ',tb.strDt) AS 창고주소
+		        , ui.loginID 로그인아이디
+		        , ui.name 담당자성함
+		        , ui.email 이메일주소
+		        , CONCAT(ui.hp1,'-',ui.hp2,'-',ui.hp3) AS 연락처        
+			FROM tb_storage tb
+		    LEFT JOIN tb_userinfo ui ON tb.loginID = ui.loginID;
+	</select>
+	
+	<!-- [공통] count 기능 -->
+	<select id="admstdCnt" resultType="int">
+		SELECT count(*) FROM tb_userinfo;
+	</select>
+	
+	<!-- 창고 등록 -->
+	<insert id="admstdAdd">
+		INSERT INTO tb_storage ( strNo, strName, strPcode, strAddr, strDt, loginID, strMnm )
+						VALUES ( #{strNo}, #{strName}, #{strPcode}, #{strAddr}, #{strDt}, #{loginID}, #{strMnm} );
+	</insert>
+	
+	<!-- 창고 수정 -->
+	<update id="admstdUpdate">
+		UPDATE tb_storage st						
+			SET st.strName = #{strName},
+				st.strPcode = CONCAT(tb.strAddr,' ',tb.strDt)
+		        st.strAddr = #{strAddr},
+		        st.strDt = #{strDt},
+				st.loginID = (SELECT loginID FROM tb_userinfo WHERE loginID=#{loginID})
+		WHERE strNo = #{strNo};
+	</update>
+	
+	<!-- 창고 삭제 -->
+	<delete id="admstdDel">
+		DELETE 
+			FROM tb_storage
+     	WHERE strNo = #{strNo};
+	</delete>
+	
+	<!-- 검색 : loginID -->
+	<select id="searchId">
+		SELECT name
+				FROM tb_userinfo
+		WHERE loginID = #{loginID};
+	</select>
+
+	<!-- 검색 : name -->
+	<select id="searchName">
+		SELECT loginID
+			FROM tb_userinfo
+		WHERE name = #{name};
+	</select>
+
+</mapper>

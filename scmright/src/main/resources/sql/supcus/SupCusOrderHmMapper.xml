@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.supcus.dao.SupCusOrderHmDao">
+
+	<select id="selectProductInfo" resultType="kr.happyjob.study.supcus.model.SupCusOrderHmModel">
+	
+		SELECT
+		tb_cOrder.coNo,tb_cOrder.loginID,tb_cOrder.coDate,tb_cOrder.coDpsts,tb_product.prodName
+		FROM tb_cOrder
+
+		LEFT OUTER JOIN tb_product ON tb_product.prodNo=tb_cOrder.prodNo
+
+
+		 <where>
+			<!-- AND tb_cOrder.coDpsts='1' -->
+			<if test="(checkBoxStatus != null) and (checkBoxStatus.equals('checked'))">
+				AND tb_cOrder.coDpsts='0'
+			</if>
+			<if test="(searchKey != null) and (!searchKey.equals(''))">
+				<choose>
+			
+					<when test="(searchKey != null) and (searchKey eq 'loginID'.toString())">
+						AND tb_cOrder.loginID LIKE CONCAT('%', #{searchWord}, '%')
+						<if test="(!startDate.equals('')) or (!endDate.equals(''))">
+		  					<![CDATA[
+		  						AND tb_cOrder.coDate >= DATE(#{startDate}) 
+		  						AND tb_cOrder.coDate < DATE(#{endDate})+1
+		  					]]>
+						</if>
+					</when>
+					<when
+						test="(searchKey != null) and (searchKey eq 'prodName'.toString())">
+						AND tb_product.prodName LIKE CONCAT('%', #{searchWord}, '%')
+						<if test="(!startDate.equals('')) or (!endDate.equals(''))">
+		  					<![CDATA[
+		  						AND tb_cOrder.coDate >= DATE(#{startDate}) 
+		  						AND tb_cOrder.coDate < DATE(#{endDate})+1
+		  					]]>
+						</if>
+					</when>
+				</choose>
+			</if>
+		</where> 
+ 		GROUP BY tb_cOrder.coNo
+
+		ORDER BY tb_cOrder.coNo DESC 
+
+		LIMIT #{startnum},#{pageSize}
+	</select>
+
+
+	<select id="searchlistcnt" resultType="int">
+		SELECT COUNT(*)
+		FROM
+		(SELECT 
+		tb_cOrder.coNo,tb_cOrder.loginID,tb_cOrder.coDate,tb_cOrder.coDpsts,tb_product.prodName
+		 FROM 
+		tb_cOrder
+				LEFT OUTER JOIN tb_product ON tb_product.prodNo=tb_cOrder.prodNo
+
+
+		 <where>
+			<!-- AND tb_cOrder.coDpsts='1' -->
+			<if test="(checkBoxStatus != null) and (checkBoxStatus.equals('checked'))">
+				AND tb_cOrder.coDpsts='0'
+			</if>
+			
+			<if test="(searchKey != null) and (!searchKey.equals(''))">
+				<choose>
+				
+					<when test="(searchKey != null) and (searchKey eq 'loginID'.toString())">
+						AND tb_cOrder.loginID LIKE CONCAT('%', #{searchWord}, '%')
+						<if test="(!startDate.equals('')) or (!endDate.equals(''))">
+		  					<![CDATA[
+		  						AND tb_cOrder.coDate >= DATE(#{startDate}) 
+		  						AND tb_cOrder.coDate < DATE(#{endDate})+1
+		  					]]>
+						</if>
+					</when>
+					<when
+						test="(searchKey != null) and (searchKey eq 'prodName'.toString())">
+						AND tb_product.prodName LIKE CONCAT('%', #{searchWord}, '%')
+						<if test="(!startDate.equals('')) or (!endDate.equals(''))">
+		  					<![CDATA[
+		  						AND tb_cOrder.coDate >= DATE(#{startDate}) 
+		  						AND tb_cOrder.coDate < DATE(#{endDate})+1
+		  					]]>
+						</if>
+					</when>
+				</choose>
+			</if>
+		</where> 
+ 		GROUP BY tb_cOrder.coNo
+
+		ORDER BY tb_cOrder.coNo DESC )
+		tb_cOrder
+	</select>
+
+	<select id="selectorderlist"
+		resultType="kr.happyjob.study.supcus.model.SupCusOrderHmDetailModel">
+		select
+		coNo,prodName,coCnt,delPrice,(delPrice*coCnt),tb_userinfo.loginID,bankNo
+		from tb_cOrder LEFT JOIN tb_userinfo
+		ON
+		tb_cOrder.loginID=tb_userinfo.loginID LEFT JOIN tb_product
+		ON
+		tb_cOrder.prodNo=tb_product.prodNo where coNo=#{coNo}
+	</select>
+
+	<select id="selectorderdetaillist"
+		resultType="kr.happyjob.study.supcus.model.SupCusOrderHmDetailModel">
+
+		select prodName,coCnt,delPrice,(delPrice*coCnt) from
+		tb_cOrder
+		LEFT JOIN tb_userinfo
+		ON tb_cOrder.loginID=tb_userinfo.loginID
+		LEFT JOIN
+		tb_product
+		ON tb_cOrder.prodNo=tb_product.prodNo where
+		coNo=#{coNo}
+
+
+	</select>
+
+	<update id="updeateinout">
+
+		UPDATE tb_cOrder
+		SET coDpsts="1"
+
+		WHERE coNo=#{coNo}
+
+	</update>
+
+</mapper>
