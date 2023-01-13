@@ -48,10 +48,15 @@
 		}
 
 		var callBack = function(returndata) {
-			alert("callBack : "+callBack)
-			//searchStrList(returndata, currentPage);
+			console.log("returndata : "+returndata)
+			if( returndata = '' || null || !returndata || 0 || NaN ) {
+				swal("유효하지 않은 회원입니다")
+			} else {
+				swal("유효한 회원입니다");
+			}
+						//searchStrList(returndata, currentPage);
 		}
-		callAjax("/admstd/searchName.do", "post", "json", true, param, callBack);
+		callAjax("/admstd/searchName.do", "post", "text", true, param, callBack);
 	}
 	/* 저장기능구현시
 	let emailId = $("input[name='email']").val();
