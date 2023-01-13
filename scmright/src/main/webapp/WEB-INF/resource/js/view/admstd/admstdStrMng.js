@@ -5,6 +5,7 @@
 
 	$(function() {
 		strList();
+		fButtonClickEvent();
 	});
 
 	// 버튼 클릭 이벤트
@@ -17,6 +18,12 @@
 				break;
 			case 'addStrBtn': addStrBtn(); // 창고등록 버튼 클릭
 				break;
+			case 'btnSubmit' : if($("#btnSaveEdit").text()=='저장') {
+									admstdStrOne();
+								} else if($("#btnSaveEdit").text()=='수정') {
+									admstdUpdate();
+								}
+				break;
 			}
 		});
 	}
@@ -25,8 +32,60 @@
 		console.log("검색 버튼 클릭")
 	}
 	
+	function btnfindMng() {
+		let textCk = $("input[name='strMnm']").val();
+		if( textCk = '' || null || !textCk || 0 || NaN ) {
+			swal("검색하시기 이전, 빈 칸에 담당자 성함을 먼저 입력해주세요")
+		} else {
+			findMng();
+		}
+	}
+	
+	function findMng() {
+
+		var param = {
+			name :  $("input[name='strMnm']").val()
+		}
+
+		var callBack = function(returndata) {
+			alert("callBack : "+callBack)
+			//searchStrList(returndata, currentPage);
+		}
+		callAjax("/admstd/searchName.do", "post", "json", true, param, callBack);
+	}
+	/* 저장기능구현시
+	let emailId = $("input[name='email']").val();
+		let emailValue = $("#selectEmail").val();
+		alert(emailId)
+		alert(emailValue)
+		
+		 var param = {
+			strName : $("input[name='strName']").val()
+			, strMnm : $("input[name='strMnm']").val()
+			, hp1 : $("input[name='hp1']").val()
+			, hp2 : $("input[name='hp2']").val()
+			, hp3 : $("input[name='hp3']").val()
+			, email : $("input[name='email']").val()
+			, textCk : $("input[name='strMnm']").val()
+			
+			
+			textCk : $("#searchKey").val(), // searchkey : 검색시 select박스
+			searchInput : $("#searchInput").val(), // sInput : 검색시 input text박스	
+			pageNavi : $("#pageNavi").val(), // 기본 pagingNav = 1
+			currentPage : currentPage,
+			pageSize : pageSize
+		};	*/
+	
 	function addStrBtn() {
-		console.log("창고등록 버튼 클릭")
+		$("#btnSaveEdit").show().text("저장");
+		gfModalPop("#fModalAddStr")		
+	}
+	
+	function admstdStrOne() {
+		
+	}
+	
+	function admstdUpdate() {
 	}
 	
 	function strList(currentPage) {
@@ -55,4 +114,9 @@
 
 		$("#pagingNavi").empty().append(paginationHtml);
 		$("#currentPage").val(currentPage);
+	}
+	
+	function fModalSelectOne(strNo) {
+		$("#btnSaveEdit").show().text("수정");
+		gfModalPop("#fModalAddStr");
 	}

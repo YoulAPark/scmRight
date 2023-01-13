@@ -28,6 +28,14 @@
 </script>
 
 <style>
+#fModalAddStr {
+				width : 1000px;
+				display : table;
+				align : center;
+}
+.sHp {
+	width : 60px;
+}
 </style>
 
 </head>
@@ -115,7 +123,7 @@
 								<!-- 신규등록 버튼 -->
 								<span class="fr"> 
 									<c:set var="nullNum" value=""></c:set>
-									<a onclick="" class="btnType blue" id="addStrBtn" name="btn"><span>창고등록</span></a>
+									<a href="" class="btnType blue" id="addStrBtn" name="btn"><span>창고등록</span></a>
 								</span>
 							</div>
 						</div> <!--// content -->
@@ -129,14 +137,12 @@
 
 		<!-- ############################################################################################################################### -->
 
-		<!-- 회원관리 모달 -->
-		<div id="user" class="layerPop layerType2">
+		<!-- Modal 창고등록 -->
+		<div id="fModalAddStr" class="layerPop layerType2">
 			<form id="RegisterForm" action="" method="post">
-				<input type="hidden" id="loginID" name="loginID">
-				<!-- 수정시 필요한 num 값을 넘김  -->
 				<dl>
 					<dt>
-						<strong>회원 추가</strong>
+						<strong>창고등록</strong>
 					</dt>
 
 					<dd class="content">
@@ -146,137 +152,99 @@
 
 							<colgroup>
 								<col width="120px">
-								<col width="*">
+								<col width="200px">
 								<col width="120px">
-								<col width="*">
+								<col width="200px">
 							</colgroup>
 
 							<tbody>
 
 								<tr>
-									<!-- 기업고객/내부직원 선택 -->
-									<th scope="row" rowspan="3"><select id="checkstaff"
-										name="checkstaff">
-											<option name="instaff" value="instaff" selected="selected">내부직원</option>
-											<option name="outstaff" value="outstaff">기업고객</option>
-									</select></th>
-									<!-- 아이디 -->
-									<th class="iInput" scope="row">아이디 <span class="font_red">*</span></th>
-									<td><input type="text" name="loginId" id="loginId" />
-										<button id="duplicate_check" type="button"
-											onclick="userIdCheck()">중복체크</button></td>
-									<!-- 비밀번호 -->
-									<th class="iInput" scope="row">비밀번호<span class="font_red">*</span></th>
-									<td><input type="password" name="password" id="password" />
-									</td>
+									<!-- 창고코드 -->
+									<th class="" scope="row">창고코드</th>
+										<td>
+											<input type="hidden" name="strNo" id="" style="width:100%;"/>
+										</td> 
+									<!-- 창고명 -->
+									<th class="" scope="row">창고명</th>
+										<td>
+											<input type="text" name="strName" id="" style="width:100%;"/>
+										</td>
 								</tr>
 
 								<tr>
-									<!-- 연락처 -->
-									<th scope="row">연락처 <span class="font_red">*</span></th>
-									<td><input class="iHp" type="text" id="tel1" name="tel1">
-										- <input class="iHp" type="text" id="tel2" name="tel2">
-										- <input class="iHp" type="text" id="tel3" name="tel3">
-									</td>
-									<!-- 이메일 -->
+									<!-- 담당자 -->
+									<th class="" scope="row">담당자</th>
+										<td>
+											<input type="text" name="strMnm" id="strMnm" style="width:60%;"/>
+											<input type="button" class="" value="담당자검색" onclick="btnfindMng()"/>
+										</td>
+									<!-- 전화번호 -->
+									<th class="" scope="row">전화번호</th>
+										<td>
+											<input class="sHp" type="text" name="hp1" id="" style="width:75px"/>
+											 -
+											<input class="sHp" type="text" name="hp2" id="" style="width:75px"/>
+											 -
+											<input class="sHp" type="text" name="hp3" id="" style="width:75px"/>
+										</td>
+								</tr>
+								
+								<!-- 이메일 -->
+								<tr>	
 									<th scope="row">이메일</th>
-									<td class="iEmail"><input type="text" name="email"
-										id="email"></td>
-								</tr>
-
-								<!-- ################################################## 내부직원 ##################################################   -->
-								<tr id="instaff">
-									<!-- 직원명 -->
-									<th class="instfName" scope="row">직원명<span
-										class="font_red">*</span></th>
-									<td><input type="text" name="name" id="name" /></td>
-									<!-- 담당업무 -->
-									<th class="isntfwork" scope="row">담당업무<span
-										class="font_red">*</span></th>
-									<td>
-										<div id="chaDiv">
-											<select id="selectChaCD" name="selectChaCD">
-												<c:forEach items="${listChaCD}" var="list">
-													<option id="optionChaCD" value="${list.user_type}"
-														name="optionChaCD"><c:out
-															value="${list.chaCD_name}" /></option>
-												</c:forEach>
-											</select>
-										</div>
+									<td colspan="4" class="iEmail">
+										<input type="text" name="email" id="email" style="width:150px%;">
+										 @ 
+										<select style="width:100px; margin-right:10px" name="selectEmail" id="selectEmail">
+											 <option value="1">직접입력</option>
+											 <option value="naver.com" selected>naver.com</option>
+											 <option value="hanmail.net">hanmail.net</option>
+											 <option value="hotmail.com">hotmail.com</option>
+											 <option value="nate.com">nate.com</option>
+											 <option value="yahoo.co.kr">yahoo.co.kr</option>
+											 <option value="empas.com">empas.com</option>
+											 <option value="dreamwiz.com">dreamwiz.com</option>
+											 <option value="freechal.com">freechal.com</option>
+											 <option value="lycos.co.kr">lycos.co.kr</option>
+											 <option value="korea.com">korea.com</option>
+											 <option value="gmail.com">gmail.com</option>
+											 <option value="hanmir.com">hanmir.com</option>
+											 <option value="paran.com">paran.com</option>
+										</select>
 									</td>
 								</tr>
-								<!-- ###########################################################################################################   -->
-
-								<!-- ################################################## 외부직원 ##################################################   -->
-								<tr id="outstaff">
-									<!-- 회사명 -->
-									<th class="instfCom" scope="row">회사명<span class="font_red">*</span></th>
-									<td><input type="text" name="company" id="company" /></td>
-									<!-- 담당자명 -->
-									<th class="isntfMng" scope="row">담당자명<span
-										class="font_red">*</span></th>
-									<td><input type="text" name="name2" id="name2" /></td>
-								</tr>
-								<!-- ###########################################################################################################   -->
-
+								
 								<!-- 우편번호찾기 -->
 								<tr>
-									<th class="postNum" scope="row">우편번호<span class="font_red">*</span></th>
-									<td colspan="4"><input type="text" name="zipcode"
-										id="zipcode" /> <input type="button" class="findPost"
-										value="우편번호 찾기" onclick="execDaumPostcode()" /></td>
-								</tr>
-
-								<!-- 주소1 -->
-								<tr class="addr">
-									<th scope="row">주소<span class="font_red">*</span></th>
-									<td colspan="4"><input type="text" name="address"
-										id="address" size="100" /></td>
-								</tr>
-
-								<!-- 주소2 -->
-								<tr class="addr">
-									<th scope="row">상세주소<span class="font_red">*</span></th>
-									<td colspan="4"><input type="text" name="dt_address"
-										id="dt_address" size="100" /></td>
-								</tr>
-
-								<!-- ################################################## 외부직원 ##################################################   -->
-								<tr id="outstaff_account">
-									<th class="bankNum" scope="row">계좌번호<span class="font_red">*</span></th>
-									<td colspan="2"><input type="text" name="account"
-										id="account" size="30" /></td>
-
-									<th class="bankNum" scope="row">은행명<span class="font_red">*</span></th>
-									<td>
-										<div id="bankDiv">
-											<select id="selectBankCD" name="selectBankCD">
-												<c:forEach items="${listBankName}" var="list">
-													<option id="optionBankCD" value="${list.bank_cd}"
-														name="optionBankCD"><c:out
-															value="${list.bank_name}" />
-													</option>
-												</c:forEach>
-											</select>
-										</div>
+									<th class="" scope="row">우편번호</th>
+									<td colspan="4"><input type="text" name="" id=""  style="width:100px;"/> 
+										<input type="button" class="" value="우편번호찾기" onclick="execDaumPostcode()"/>
 									</td>
 								</tr>
-								<!-- ##########################################################################################################   -->
+								
+								<!-- 창고위치 -->
+								<tr class="">
+									<th scope="row">창고위치</th>
+									<td colspan="4"><input type="text" name="" id="" style="width:100%;"/></td>
+								</tr>
+								
+								<!-- 상세주소 -->
+								<tr class="">
+									<th scope="row">상세주소</th>
+									<td colspan="4"><input type="text" name="" id="" style="width:100%;"/></td>
+								</tr>
+
 							</tbody>
 
 						</table>
 						<div class="btn_areaC mt30">
-							<a href="" class="btnType blue" id="btnUpdateUser" name="btn"
-								style="display: none"><span>수정</span></a> <a href=""
-								class="btnType blue" id="btnDeleteUser" name="btn"><span>삭제</span></a>
-							<a href="" class="btnType blue" id="btnApprovalUser" name="btn"><span>승인</span></a>
-							<a href="" class="btnType blue" id="btnComebackUser" name="btn"><span>복구</span></a>
-							<a href="" class="btnType blue" id="btnSaveUser" name="btn"><span>저장</span></a>
-							<a href="" class="btnType gray" id="btnClose" name="btn"><span>취소</span></a>
+							<a href="" class="btnType blue" id="btnSubmit" name="btn"><span id="btnSaveEdit" name="btn">저장</span></a>
+							<a href="" class="btnType blue" id="btnClose" name="btn"><span>취소</span></a>
 						</div>
 					</dd>
 				</dl>
-				<a href="" class="closePop"><span class="hidden">닫기</span></a>
+				<a href="" class="closePop" id="btnClose" name="btn"><span class="hidden">닫기</span></a>
 			</form>
 		</div>
 		<!-- #################################################################################################################################################################################################################### -->

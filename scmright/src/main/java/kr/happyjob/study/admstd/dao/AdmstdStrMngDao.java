@@ -38,7 +38,7 @@ public interface AdmstdStrMngDao {
 	public List<AdmstdStrMngModel> searchId() throws Exception;
 	
 	// 8. [SELECT] 이름 검색
-	public List<AdmstdStrMngModel> searchName() throws Exception;
+	public List<AdmstdStrMngModel> searchName(String name) throws Exception;
 	
 	
 	

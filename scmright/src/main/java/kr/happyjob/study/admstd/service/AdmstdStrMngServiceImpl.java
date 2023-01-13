@@ -1,3 +1,4 @@
+
 package kr.happyjob.study.admstd.service;
 
 import java.util.List;
@@ -76,9 +77,9 @@ public class AdmstdStrMngServiceImpl implements AdmstdStrMngService {
 	}
 	
 	// 8. [SELECT] 이름 검색
-	public List<AdmstdStrMngModel> searchName() throws Exception{
+	public List<AdmstdStrMngModel> searchName(String name) throws Exception{
 		logger.info("Start " + className + ".searchName");
-		List<AdmstdStrMngModel> list=strMngDao.searchName();
+		List<AdmstdStrMngModel> list=strMngDao.searchName(name);
 		logger.info("End " + className + ".searchName");
 		return list;
 	}

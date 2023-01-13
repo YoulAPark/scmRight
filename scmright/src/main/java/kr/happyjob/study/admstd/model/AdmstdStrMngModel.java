@@ -87,13 +87,25 @@ public class AdmstdStrMngModel {
 	public void setStrMnm(String strMnm) {
 		this.strMnm = strMnm;
 	}
+	public String getTotalAddr() {
+		return totalAddr;
+	}
+	public String getTotalHp() {
+		return totalHp;
+	}
+	public void setTotalHp(String totalHp) {
+		this.totalHp = totalHp;
+	}
+	public void setTotalAddr(String totalAddr) {
+		this.totalAddr = totalAddr;
+	}
 	
 	@Override
 	public String toString() {
 		return "AdmstdStrMngModel [strNo=" + strNo + ", strName=" + strName + ", strAddr=" + strAddr + ", strDt="
 				+ strDt + ", name=" + name + ", email=" + email + ", hp1=" + hp1 + ", hp2=" + hp2 + ", hp3=" + hp3
-				+ ", loginID=" + loginID + ", strPcode=" + strPcode + ", strMnm=" + strMnm + ", totalAddr="
-				+ totalAddr + ", totalHp=" + totalHp + "]";
+				+ ", loginID=" + loginID + ", strPcode=" + strPcode + ", strMnm=" + strMnm + ", totalAddr=" + totalAddr
+				+ ", totalHp=" + totalHp + "]";
 	}
-	
+		
 }

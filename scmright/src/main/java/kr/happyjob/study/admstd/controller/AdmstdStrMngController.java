@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.happyjob.study.admstd.model.AdmstdStrMngModel;
 import kr.happyjob.study.admstd.service.AdmstdStrMngService;
@@ -104,12 +105,13 @@ public class AdmstdStrMngController {
 //		return list;
 //	}
 //
-//	// 8. [SELECT] 이름 검색
-//	public List<AdmstdStrMngModel> searchName() throws Exception {
-//		logger.info("Start " + className + ".searchName");
-//		List<AdmstdStrMngModel> list = strMngService.searchName();
-//		logger.info("End " + className + ".searchName");
-//		return list;
-//	}
+	// 8. [SELECT] 이름 검색	
+	@RequestMapping("searchName.do")
+	public String searchName(@RequestParam("name") String name) throws Exception {
+		logger.info("Start " + className + ".searchName");
+		List<AdmstdStrMngModel> list = strMngService.searchName(name);
+		logger.info("End " + className + ".searchName");
+		return "admstd/admstdStrMngList";
+	}
 
 }
