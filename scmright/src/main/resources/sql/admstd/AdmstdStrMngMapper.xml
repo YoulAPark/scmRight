@@ -9,6 +9,7 @@
 		SELECT 	  tb.strNo
 				, tb.strName
 		        , CONCAT(tb.strAddr,' ',tb.strDt) AS totalAddr
+		        , ui.loginID
 		        , ui.name
 		        , ui.email
 		        , CONCAT(ui.hp1,'-',ui.hp2,'-',ui.hp3) AS totalHp    
@@ -18,15 +19,19 @@
 	</select>
 
 	<!-- 단 건 출력 -->
-	<select id="admstdStrOne" resultType="kr.happyjob.study.admstd.model.AdmstdStrMngModel">
-		SELECT 	tb.strName
-		        , CONCAT(tb.strAddr,' ',tb.strDt) AS 창고주소
-		        , ui.loginID 로그인아이디
-		        , ui.name 담당자성함
-		        , ui.email 이메일주소
-		        , CONCAT(ui.hp1,'-',ui.hp2,'-',ui.hp3) AS 연락처        
-			FROM tb_storage tb
-		    LEFT JOIN tb_userinfo ui ON tb.loginID = ui.loginID;
+	<select id="admstdStrOne" resultType="kr.happyjob.study.admstd.model.AdmstdStrMngModel" parameterType="string">
+		SELECT 	st.strName
+		        , CONCAT(st.strAddr,' ',st.strDt) AS totalAddr
+		        , st.strAddr
+		        , st.strDt
+		        , ui.loginID 
+		        , ui.name 
+		        , ui.email 
+		        , ui.hp1
+		        , ui.hp2
+		        , ui.hp3  
+			FROM tb_storage st
+		    LEFT JOIN tb_userinfo ui ON st.loginID = ui.loginID;
 	</select>
 	
 	<!-- [공통] count 기능 -->

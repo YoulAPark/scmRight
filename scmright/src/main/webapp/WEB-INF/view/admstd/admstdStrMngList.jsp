@@ -19,7 +19,7 @@
 		<c:forEach items="${list}" var="list"> <!-- tr :행 / td: 열 -->
 			<tr>
 				<td>${list.strNo}</td>
-				<td onclick="fModalSelectOne(${list.strNo})">${list.strName}</td>
+				<td onclick="fModalSelectOne('${list.loginID}')">${list.strName}</td>
 				<td>${list.totalAddr}</td>
 				<td>${list.name}</td>
 				<td>${list.email}</td>

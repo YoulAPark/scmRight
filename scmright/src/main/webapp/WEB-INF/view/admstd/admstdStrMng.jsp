@@ -22,6 +22,7 @@
 <!-- common_include.jsp 삽입 -->
 <jsp:include page="/WEB-INF/view/common/common_include.jsp"></jsp:include>
 <script src='${CTX_PATH}/js/view/admstd/admstdStrMng.js'></script>
+<script src='${CTX_PATH}/js/table2excel/jquery.table2excel.js'></script>
 
 <script type="text/javascript">
 // admstdStrMng.js 확인
@@ -91,7 +92,7 @@
 
 							<!-- ######################### divUserList 출력 #########################-->
 							<div class="divUserList">
-								<table class="col">
+								<table class="col table2excel" id="storageList">
 									<!-- caption : 표에 대한 설명을 나타나기 위함 -->
 									<caption>caption</caption>
 									<!-- table 비율 지정 -->
@@ -120,10 +121,11 @@
 								<!-- 페이징 처리 -->
 								<div class="paging_area" id="pagingNavi"></div>
 
-								<!-- 신규등록 버튼 -->
+								<!-- 창고등록/엑셀 다운로드 버튼 -->
 								<span class="fr"> 
 									<c:set var="nullNum" value=""></c:set>
 									<a href="" class="btnType blue" id="addStrBtn" name="btn"><span>창고등록</span></a>
+									<a href="" class="btnType basic" id="excelBtn" name="btn"><span>Excel</span></a>
 								</span>
 							</div>
 						</div> <!--// content -->
@@ -139,10 +141,9 @@
 
 		<!-- Modal 창고등록 -->
 		<div id="fModalAddStr" class="layerPop layerType2">
-			<form id="RegisterForm" action="" method="post">
 				<dl>
 					<dt>
-						<strong>창고등록</strong>
+						<strong id="strText"></strong>
 					</dt>
 
 					<dd class="content">
@@ -157,36 +158,36 @@
 								<col width="200px">
 							</colgroup>
 
-							<tbody>
-
+							<tbody id="admstrStrOneList">
 								<tr>
 									<!-- 창고코드 -->
 									<th class="" scope="row">창고코드</th>
-										<td>
-											<input type="hidden" name="strNo" id="" style="width:100%;"/>
+										<td id="strNo">											
+											<input type="hidden" name="strNo" id="strNo" style="width:100%;"/>
 										</td> 
 									<!-- 창고명 -->
 									<th class="" scope="row">창고명</th>
-										<td>
-											<input type="text" name="strName" id="" style="width:100%;"/>
+										<td id="strName">
+											<input type="text" name="strName"style="width:100%;"/>
 										</td>
 								</tr>
 
 								<tr>
 									<!-- 담당자 -->
 									<th class="" scope="row">담당자</th>
-										<td>
-											<input type="text" name="strMnm" id="strMnm" style="width:60%;"/>
+										<td>										
+											<input type="text" name="name" id="name" style="width:60%;"/>
 											<input type="button" class="" value="담당자검색" onclick="btnfindMng()"/>
 										</td>
 									<!-- 전화번호 -->
 									<th class="" scope="row">전화번호</th>
 										<td>
-											<input class="sHp" type="text" name="hp1" id="" style="width:75px"/>
+											
+											<input class="sHp" type="text" name="hp1" id="hp1" style="width:75px"/>
 											 -
-											<input class="sHp" type="text" name="hp2" id="" style="width:75px"/>
+											<input class="sHp" type="text" name="hp2" id="hp2" style="width:75px"/>
 											 -
-											<input class="sHp" type="text" name="hp3" id="" style="width:75px"/>
+											<input class="sHp" type="text" name="hp3" id="hp3" style="width:75px"/>
 										</td>
 								</tr>
 								
@@ -194,6 +195,7 @@
 								<tr>	
 									<th scope="row">이메일</th>
 									<td colspan="4" class="iEmail">
+										
 										<input type="text" name="email" id="email" style="width:150px%;">
 										 @ 
 										<select style="width:100px; margin-right:10px" name="selectEmail" id="selectEmail">
@@ -226,15 +228,14 @@
 								<!-- 창고위치 -->
 								<tr class="">
 									<th scope="row">창고위치</th>
-									<td colspan="4"><input type="text" name="" id="" style="width:100%;"/></td>
+									<td colspan="4"><input type="text" name="" id="strAddr" style="width:100%;"/></td>
 								</tr>
 								
 								<!-- 상세주소 -->
 								<tr class="">
 									<th scope="row">상세주소</th>
-									<td colspan="4"><input type="text" name="" id="" style="width:100%;"/></td>
+									<td colspan="4"><input type="text" name="" id="strDt" style="width:100%;"/></td>
 								</tr>
-
 							</tbody>
 
 						</table>
@@ -245,7 +246,6 @@
 					</dd>
 				</dl>
 				<a href="" class="closePop" id="btnClose" name="btn"><span class="hidden">닫기</span></a>
-			</form>
 		</div>
 		<!-- #################################################################################################################################################################################################################### -->
 	</form>

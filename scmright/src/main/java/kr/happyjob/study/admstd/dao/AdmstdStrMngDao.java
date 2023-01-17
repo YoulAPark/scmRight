@@ -20,7 +20,7 @@ public interface AdmstdStrMngDao {
 	public List<AdmstdStrMngModel> admstdStrList(Map<String,Object> map) throws Exception;
 	
 	// 2. [SELECT] 단 건 출력
-	public List<AdmstdStrMngModel> admstdStrOne() throws Exception;
+	public List<AdmstdStrMngModel> admstdStrOne(String loginID) throws Exception;
 	
 	// 3. [SELECT] count 출력
 	public int admstdCnt() throws Exception;
@@ -39,8 +39,5 @@ public interface AdmstdStrMngDao {
 	
 	// 8. [SELECT] 이름 검색
 	public List<AdmstdStrMngModel> searchName(String name) throws Exception;
-	
-	
-	
 	
 }

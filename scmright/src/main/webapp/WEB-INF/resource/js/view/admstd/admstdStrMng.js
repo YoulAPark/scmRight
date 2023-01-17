@@ -14,6 +14,8 @@
 			e.preventDefault(); // 기본 클릭 동작을 막아주는 역할을 함
 			var btnId = $(this).attr('id');
 			switch (btnId) {
+			case 'btnClose' : gfCloseModal(); // 모달 창 닫기 버튼 클릭
+				break;
 			case 'searchBtn' : searchBtn(); // 검색 버튼 클릭
 				break;
 			case 'addStrBtn': addStrBtn(); // 창고등록 버튼 클릭
@@ -23,6 +25,8 @@
 								} else if($("#btnSaveEdit").text()=='수정') {
 									admstdUpdate();
 								}
+				break;
+			case 'excelBtn' : excelBtn(); // 엑셀 버튼 클릭				
 				break;
 			}
 		});
@@ -39,6 +43,15 @@
 		} else {
 			findMng();
 		}
+	}
+	
+	function excelBtn() {
+		$("#storageList").table2excel({
+			exclude : ".excludeThisClass"
+			,	name : "Worksheet Name"
+			,	filename : "창고리스트.xls"
+			,	preserveColors : false
+		});
 	}
 	
 	function findMng() {
@@ -82,7 +95,8 @@
 		};	*/
 	
 	function addStrBtn() {
-		$("#btnSaveEdit").show().text("저장");
+		$("#strText").show().text("창고등록"); // strong 태그에 '창고등록'이라고 뜨게 설정
+		$("#btnSaveEdit").show().text("저장"); // 하단 버튼에 '저장'이라고 뜨게 설정
 		gfModalPop("#fModalAddStr")		
 	}
 	
@@ -121,7 +135,24 @@
 		$("#currentPage").val(currentPage);
 	}
 	
-	function fModalSelectOne(strNo) {
-		$("#btnSaveEdit").show().text("수정");
+	// 창고이름 클릭시 수정함수로 이어지게끔
+	function fModalSelectOne(loginID) {
+		$("#strText").show().text("창고수정"); // strong 태그에 '창고수정'이라고 뜨게 설정
+		$("#btnSaveEdit").show().text("수정"); // 하단 버튼에 '수정'이라고 뜨게 설정
 		gfModalPop("#fModalAddStr");
+		admstdStrOne(loginID); // 창고 수정 실행
 	}
+	
+	// 단 건 조회
+	function admstdStrOne(loginID){
+		console.log("loginID : "+loginID)
+		var param = {
+			loginID : loginID
+		};
+		var listCallBack = function(returnData) {
+			console.log("returnData : "+returnData)
+			 $("#strName").empty().prepend(returnData[0].strName);
+		}
+		callAjax("/admstd/admstdStrOne.do", "post", "text", true, param, listCallBack);
+	}
+	

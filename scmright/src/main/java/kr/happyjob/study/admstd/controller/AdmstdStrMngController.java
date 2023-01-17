@@ -1,5 +1,6 @@
 package kr.happyjob.study.admstd.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,13 +62,17 @@ public class AdmstdStrMngController {
 		return "admstd/admstdStrMngList";
 	}
 
-//	// 2. [SELECT] 단 건 출력
-//	public List<AdmstdStrMngModel> admstdStrOne() throws Exception {
-//		logger.info("Start " + className + ".admstdStrOne");
-//		List<AdmstdStrMngModel> list = strMngService.admstdStrOne();
-//		logger.info("End " + className + ".admstdStrOne");
-//		return list;
-//	}
+	// 2. [SELECT] 단 건 출력
+	@RequestMapping("admstdStrOne.do")
+	@ResponseBody
+	public Map<String, Object> admstdStrOne(@RequestParam("loginID") String loginID) throws Exception {
+		logger.info("Start " + className + ".admstdStrOne");
+		List<AdmstdStrMngModel> list = strMngService.admstdStrOne(loginID);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("list", list);
+		logger.info("End " + className + ".admstdStrOne");
+		return map;
+	}
 //
 //	// 3. [SELECT] count 출력
 //	public void admstdCnt() throws Exception {
@@ -84,6 +89,7 @@ public class AdmstdStrMngController {
 //	}
 //
 //	// 5. [UPDATE] 창고 수정
+//	@RequestMapping("admstdUpdate.do")
 //	public void admstdUpdate() throws Exception {
 //		logger.info("Start " + className + ".admstdUpdate");
 //		strMngService.admstdUpdate();

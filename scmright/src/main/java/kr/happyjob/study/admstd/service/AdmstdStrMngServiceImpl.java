@@ -33,9 +33,9 @@ public class AdmstdStrMngServiceImpl implements AdmstdStrMngService {
 	}
 	
 	// 2. [SELECT] 단 건 출력
-	public List<AdmstdStrMngModel> admstdStrOne() throws Exception {
+	public List<AdmstdStrMngModel> admstdStrOne(String loginID) throws Exception {
 		logger.info("Start " + className + ".admstdStrOne");
-		List<AdmstdStrMngModel> list=strMngDao.admstdStrOne();
+		List<AdmstdStrMngModel> list=strMngDao.admstdStrOne(loginID);
 		logger.info("End " + className + ".admstdStrOne");
 		return list;
 	}
