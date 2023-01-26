@@ -24,7 +24,7 @@ import kr.happyjob.study.admstd.service.AdmstdStrMngService;
 @RequestMapping("/admstd/")
 public class AdmstdStrMngController {
 	
-	@Autowired
+	@Autowired 
 	AdmstdStrMngService strMngService;
 	// Set logger
 	private final Logger logger = LogManager.getLogger(this.getClass());
