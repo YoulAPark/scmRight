@@ -15,7 +15,7 @@ public class AdmstdNoticeController {
 	// Get class name for logger
 	private final String className = this.getClass().toString();
 		
-	// 단순 네비게이션 2
+	// 단순 네비게이션 22
 	@RequestMapping("admstdNotice.do")
 	public String AdmstdNotice() throws Exception {
 		logger.info("+ Start " + className + ".initApproval");
